@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Service.ToDo.Data;
 using Service.ToDo.Repository;
 using Service.ToDo.Repository.Impl;
+using Service.ToDo.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IUserRepository , UserRepository>();
 builder.Services.AddScoped<ITaskRepository , TaskRepository>();
+builder.Services.AddScoped<EmailProducer>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

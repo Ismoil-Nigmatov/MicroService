@@ -6,5 +6,6 @@ namespace Service.ToDo.Repository
     {
         System.Threading.Tasks.Task RegistrationAsync(User user);
         Task<User> GetUserByEmail(string email);
+        Task<string> GetUserById(int id);
     }
 }

@@ -2,6 +2,8 @@
 {
     public enum EStatus
     {
-
+        CREATED ,
+        INPROGRESS,
+        DONE
     }
 }

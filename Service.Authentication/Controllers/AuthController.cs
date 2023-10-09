@@ -39,7 +39,7 @@ namespace Service.Authentication.Controllers
                     {
                         ToEmail = request.Email,
                         Subject = $"Welcome to Our Website",
-                        Message = $"Hello {request.FullName},\\n\\nThank you for registering on our website!"
+                        Message = $"Hello {request.FullName},\n Thank you for registering on our website!"
                     };
                     _emailProducer.SendEmailRequest(emailRequest);
                     return Ok(request);

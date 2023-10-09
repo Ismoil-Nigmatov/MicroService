@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.ToDo.Dto;
+using Service.ToDo.Entity.ENUMS;
 using Service.ToDo.Repository;
+using Service.ToDo.Service;
+using Service.ToDo.Service.Request;
 
 namespace Service.ToDo.Controllers
 {
@@ -11,10 +14,14 @@ namespace Service.ToDo.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly EmailProducer _emailProducer;
 
-        public TaskController(ITaskRepository taskRepository)
+        public TaskController(ITaskRepository taskRepository, IUserRepository userRepository, EmailProducer emailProducer)
         {
             _taskRepository = taskRepository;
+            _userRepository = userRepository;
+            _emailProducer = emailProducer;
         }
 
         [HttpGet("all")]
@@ -28,6 +35,12 @@ namespace Service.ToDo.Controllers
         public async Task<ActionResult> AddTask(TaskDTO taskDto)
         {
             var task = await _taskRepository.CreateTask(taskDto);
+            EmailRequest email = new EmailRequest();
+            email.ToEmail = await _userRepository.GetUserById(task.UserId);
+            email.Subject = "Created new Task";
+            email.Message =
+                $"Created new Task => {task.Title}\n Description -> {task.Description} \n Status -> {Enum.GetName(typeof(EStatus), taskDto.Status)} \n Deadline -> {task.Deadline}";
+            _emailProducer.SendEmailRequest(email);
             return Ok(task);
         }
 
@@ -42,6 +55,12 @@ namespace Service.ToDo.Controllers
         public async Task<ActionResult> UpdateTask(int id , TaskDTO taskDto)
         {
             await _taskRepository.UpdateTask(id, taskDto);
+            EmailRequest email = new EmailRequest();
+            email.ToEmail = await _userRepository.GetUserById(taskDto.UserId);
+            email.Subject = "Updated an existing Task ";
+            email.Message =
+                $"Updated Task => Title - {taskDto.Title} \n Description - {taskDto.Description} \n Deadline - {taskDto.Deadline} \n Status - {Enum.GetName(typeof(EStatus), taskDto.Status)}";
+            _emailProducer.SendEmailRequest(email);
             return Ok();
         }
     }
